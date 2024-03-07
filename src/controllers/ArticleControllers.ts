@@ -14,7 +14,7 @@ export default new (class ArticleControllers {
 
       const article = await ArticleServices.create(data);
 
-      return res.status(200).json(article);
+      return res.status(200).json({ message: "Article created successfully." });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }

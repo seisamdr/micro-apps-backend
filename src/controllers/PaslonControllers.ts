@@ -14,7 +14,7 @@ export default new (class PaslonControllers {
 
       const paslon = await PaslonServices.create(data);
 
-      return res.status(200).json(paslon);
+      return res.status(200).json({ message: "Paslon created successfully." });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
