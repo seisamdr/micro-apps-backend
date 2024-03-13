@@ -13,13 +13,13 @@ export class Paslon {
   @Column()
   image: string;
 
-  @Column()
-  visimisi: string;
+  @Column({ type: "jsonb" })
+  visimisi: any;
 
-  @Column()
-  koalisi: string;
+  @Column({ type: "jsonb" })
+  koalisi: any;
 
-  @OneToMany(() => Vote, (vote) => vote.paslon) // Specify the correct property name
+  @OneToMany(() => Vote, (vote) => vote.paslon)
   vote: Vote[];
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })

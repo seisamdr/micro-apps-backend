@@ -26,19 +26,32 @@ export default new (class ArticleServices {
     }
   }
 
-  async find(): Promise<any> {
+  async find(): Promise<Article[]> {
     try {
-      const article = await AppDataSource.getRepository(Article)
+      const articles = await AppDataSource.getRepository(Article)
         .createQueryBuilder("article")
         .getMany();
 
-      return article;
+      return articles;
     } catch (error) {
       throw error;
     }
   }
 
-  async patch(articleId: number, reqBody: any): Promise<any> {
+  async findOne(id: number): Promise<any> {
+    try {
+      const article = await AppDataSource.getRepository(Article)
+        .createQueryBuilder("article")
+        .where("article.id = :id", { id: id })
+        .getOne();
+
+      return article;
+    } catch (error) {
+      throw new Error(`Error while finding article by id: ${error}`);
+    }
+  }
+
+  async update(articleId: number, reqBody: any): Promise<any> {
     try {
       const repository = AppDataSource.getRepository(Article);
 

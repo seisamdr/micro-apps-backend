@@ -30,12 +30,12 @@ export default new (class PartaiControllers {
     }
   }
 
-  async patch(req: Request, res: Response): Promise<Response> {
+  async update(req: Request, res: Response): Promise<Response> {
     try {
       const partaiId = parseInt(req.params.id);
       const data = req.body;
 
-      await PartaiServices.patch(partaiId, data);
+      await PartaiServices.update(partaiId, data);
 
       return res.status(200).json({ message: "Partai updated successfully." });
     } catch (error) {

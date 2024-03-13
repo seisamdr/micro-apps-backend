@@ -6,19 +6,19 @@ export class Partai {
   id: number;
 
   @Column()
+  image: string;
+
+  @Column()
   name: string;
 
   @Column()
   leader: string;
 
-  @Column()
-  visimisi: string;
+  @Column({ type: "jsonb" })
+  visimisi: any;
 
   @Column()
   address: string;
-
-  @Column()
-  logo: string;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

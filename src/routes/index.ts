@@ -1,33 +1,46 @@
 import express from "express";
+import AuthControllers from "../controllers/AuthControllers";
 import UserControllers from "../controllers/UserControllers";
 import ArticleControllers from "../controllers/ArticleControllers";
 import PartaiControllers from "../controllers/PartaiControllers";
 import PaslonControllers from "../controllers/PaslonControllers";
+import VoteControllers from "../controllers/VoteControllers";
 
 const Route = express.Router();
+
+// Route Auth
+Route.post("/register", AuthControllers.register);
+Route.post("/login", AuthControllers.login);
 
 // Route Article
 Route.post("/article", ArticleControllers.create);
 Route.get("/articles", ArticleControllers.find);
-Route.patch("/article/:id", ArticleControllers.patch);
+Route.get("/article/:id", ArticleControllers.findOne);
+Route.patch("/article/:id", ArticleControllers.update);
 Route.delete("/article/:id", ArticleControllers.delete);
 
 // Route Partai
-Route.post("/partai", PartaiControllers.create);
-Route.get("/partais", PartaiControllers.find);
-Route.patch("/partai/:id", PartaiControllers.patch);
-Route.delete("/partai/:id", PartaiControllers.delete);
+Route.post("/admin/partai", PartaiControllers.create);
+Route.get("/admin/partais", PartaiControllers.find);
+Route.patch("/admin/partai/:id", PartaiControllers.update);
+Route.delete("/admin/partai/:id", PartaiControllers.delete);
 
 // Route Paslon
-Route.post("/paslon", PaslonControllers.create);
-Route.get("/paslons", PaslonControllers.find);
-Route.patch("/paslon/:id", PaslonControllers.patch);
-Route.delete("/paslon/:id", PaslonControllers.delete);
+Route.post("/admin/paslon", PaslonControllers.create);
+Route.get("/admin/paslons", PaslonControllers.findAll);
+Route.patch("/admin/paslon/:id", PaslonControllers.update);
+Route.delete("/admin/paslon/:id", PaslonControllers.delete);
 
 // Route User
-Route.post("/user", UserControllers.create);
 Route.get("/users", UserControllers.find);
-Route.patch("/user/:id", UserControllers.patch);
+Route.get("/user/:id", UserControllers.findOne);
+Route.patch("/user/:id", UserControllers.update);
 Route.delete("/user/:id", UserControllers.delete);
+
+// Route Vote
+Route.post("/vote", VoteControllers.create);
+Route.get("/votes", VoteControllers.find);
+Route.patch("/vote/:id", VoteControllers.update);
+Route.delete("/vote/:id", VoteControllers.delete);
 
 export default Route;

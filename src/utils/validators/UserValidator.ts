@@ -6,4 +6,5 @@ export const UserValidator = Joi.object({
   gender: Joi.string().required(),
   username: Joi.string().required(),
   password: Joi.string().required(),
+  role: Joi.string().required(),
 });

@@ -2,27 +2,17 @@ import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 
 export default new (class UserServices {
-  async create(reqBody: any): Promise<any> {
+  async findOne(id: number): Promise<any> {
     try {
-      const repository = AppDataSource.getRepository(User);
+      const user = AppDataSource.getRepository(User)
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.articles", "articles")
+        .where("user.id = :id", { id: id })
+        .getOne();
 
-      const user = repository.create({
-        fullname: reqBody.fullname,
-        address: reqBody.address,
-        gender: reqBody.gender,
-        username: reqBody.username,
-        password: reqBody.password,
-      });
-
-      await AppDataSource.createQueryBuilder()
-        .insert()
-        .into(User)
-        .values(user)
-        .execute();
-
-      console.log(user);
+      return user;
     } catch (error) {
-      throw error;
+      throw error("Error while finding user by id:", error);
     }
   }
 
@@ -30,6 +20,7 @@ export default new (class UserServices {
     try {
       const users = await AppDataSource.getRepository(User)
         .createQueryBuilder("user")
+        .leftJoinAndSelect("user.articles", "articles")
         .getMany();
 
       return users;
@@ -38,33 +29,33 @@ export default new (class UserServices {
     }
   }
 
-  async patch(userId: number, reqBody: any): Promise<any> {
+  async update(id: number, data: any): Promise<any> {
     try {
-      const repository = AppDataSource.getRepository(User);
-
-      await repository
+      const user = await AppDataSource.getRepository(User)
         .createQueryBuilder()
+        .leftJoinAndSelect("user.articles", "articles")
         .update(User)
-        .set(reqBody)
-        .where("id = :id", { id: userId })
+        .set(data)
+        .where("user.id = :id", { id: id })
         .execute();
+      return user;
     } catch (error) {
-      throw error;
+      throw error("Filed to update user!", error);
     }
   }
 
-  async delete(userId: number): Promise<any> {
+  async delete(id: number): Promise<any> {
     try {
-      const repository = AppDataSource.getRepository(User);
-
-      await repository
+      const user = await AppDataSource.getRepository(User)
         .createQueryBuilder()
         .delete()
         .from(User)
-        .where("id = :id", { id: userId })
+        .where("user.id = :id", { id: id })
         .execute();
+
+      return user;
     } catch (error) {
-      throw error;
+      throw error("Filed to delete user!", error);
     }
   }
 })();

@@ -6,11 +6,21 @@ export default new (class PaslonServices {
     try {
       const repository = AppDataSource.getRepository(Paslon);
 
+      const cleanVisimisi = reqBody.visimisi
+        ? reqBody.visimisi.replace(/["\\]/g, "")
+        : "";
+      const cleanKoalisi = reqBody.koalisi
+        ? reqBody.koalisi.replace(/["\\]/g, "")
+        : "";
+
+      const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
+      const koalisi = cleanKoalisi ? cleanKoalisi.split(",") : [];
+
       const paslon = repository.create({
         name: reqBody.name,
         image: reqBody.image,
-        visimisi: reqBody.visimisi,
-        koalisi: reqBody.koalisi,
+        visimisi,
+        koalisi,
       });
 
       await AppDataSource.createQueryBuilder()
@@ -25,7 +35,7 @@ export default new (class PaslonServices {
     }
   }
 
-  async find(): Promise<any> {
+  async findAll(): Promise<any> {
     try {
       const paslon = await AppDataSource.getRepository(Paslon)
         .createQueryBuilder("paslon")
@@ -37,7 +47,7 @@ export default new (class PaslonServices {
     }
   }
 
-  async patch(paslonId: number, reqBody: any): Promise<any> {
+  async update(paslonId: number, reqBody: any): Promise<any> {
     try {
       const repository = AppDataSource.getRepository(Paslon);
 

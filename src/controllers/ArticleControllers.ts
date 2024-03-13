@@ -30,12 +30,30 @@ export default new (class ArticleControllers {
     }
   }
 
-  async patch(req: Request, res: Response): Promise<Response> {
+  async findOne(req: Request, res: Response): Promise<any> {
+    try {
+      const id = parseInt(req.params.id);
+
+      const article = await ArticleServices.findOne(id);
+
+      if (article) {
+        res.status(201).json(article);
+      } else {
+        res.status(404).json({ message: "Article not found" });
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Failed to get Article", error: error.message });
+    }
+  }
+
+  async update(req: Request, res: Response): Promise<Response> {
     try {
       const articleId = parseInt(req.params.id);
       const data = req.body;
 
-      await ArticleServices.patch(articleId, data);
+      await ArticleServices.update(articleId, data);
 
       return res.status(200).json({ message: "Article updated successfully." });
     } catch (error) {

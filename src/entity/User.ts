@@ -21,6 +21,9 @@ export class User {
   @Column()
   password: string;
 
+  // @Column()
+  // role: string;
+
   @OneToMany(() => Vote, (vote) => vote.user)
   vote: Vote[];
 

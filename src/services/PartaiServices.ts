@@ -6,12 +6,18 @@ export default new (class PartaiServices {
     try {
       const repository = AppDataSource.getRepository(Partai);
 
+      const cleanVisimisi = reqBody.visimisi
+        ? reqBody.visimisi.replace(/["\\]/g, "")
+        : "";
+
+      const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
+
       const partai = repository.create({
+        image: reqBody.image,
         name: reqBody.name,
         leader: reqBody.leader,
-        visimisi: reqBody.visimisi,
+        visimisi,
         address: reqBody.address,
-        logo: reqBody.logo,
       });
 
       await AppDataSource.createQueryBuilder()
@@ -38,7 +44,7 @@ export default new (class PartaiServices {
     }
   }
 
-  async patch(partaiId: number, reqBody: any): Promise<any> {
+  async update(partaiId: number, reqBody: any): Promise<any> {
     try {
       const repository = AppDataSource.getRepository(Partai);
 

@@ -20,9 +20,9 @@ export default new (class PaslonControllers {
     }
   }
 
-  async find(req: Request, res: Response): Promise<Response> {
+  async findAll(req: Request, res: Response): Promise<Response> {
     try {
-      const paslons = await PaslonServices.find();
+      const paslons = await PaslonServices.findAll();
 
       return res.status(200).json(paslons);
     } catch (error) {
@@ -30,12 +30,12 @@ export default new (class PaslonControllers {
     }
   }
 
-  async patch(req: Request, res: Response): Promise<Response> {
+  async update(req: Request, res: Response): Promise<Response> {
     try {
       const paslonId = parseInt(req.params.id);
       const data = req.body;
 
-      await PaslonServices.patch(paslonId, data);
+      await PaslonServices.update(paslonId, data);
 
       return res.status(200).json({ message: "Paslon updated successfully." });
     } catch (error) {
