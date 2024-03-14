@@ -18,6 +18,7 @@ export default new (class UserServices {
         .into(User)
         .values(user)
         .execute();
+
       return user;
     } catch (error) {
       console.log(error);
@@ -27,6 +28,7 @@ export default new (class UserServices {
   async login(username: string, password: string): Promise<any> {
     const repository = AppDataSource.getRepository(User);
     const user = await repository.findOne({ where: { username, password } });
+
     return user;
   }
 })();

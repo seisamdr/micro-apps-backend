@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+import { User } from "./User";
 
 @Entity()
 export class Article {
@@ -12,13 +19,11 @@ export class Article {
   content: string;
 
   @Column()
-  author: string;
-
-  @Column({ type: "date" })
-  date: Date;
-
-  @Column()
   image: string;
+
+  @ManyToOne(() => User, (user) => user.articles)
+  @JoinColumn({ name: "author", referencedColumnName: "id" })
+  author: User;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

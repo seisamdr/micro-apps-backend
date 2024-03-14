@@ -4,39 +4,26 @@ import { Partai } from "../entity/Partai";
 export default new (class PartaiServices {
   async create(reqBody: any): Promise<any> {
     try {
-      const repository = AppDataSource.getRepository(Partai);
+      // const cleanVisimisi = reqBody.visimisi
+      //   ? reqBody.visimisi.replace(/["\\]/g, "")
+      //   : "";
 
-      const cleanVisimisi = reqBody.visimisi
-        ? reqBody.visimisi.replace(/["\\]/g, "")
-        : "";
+      // const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
 
-      const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
-
-      const partai = repository.create({
+      const partai = AppDataSource.getRepository(Partai).create({
         image: reqBody.image,
         name: reqBody.name,
         leader: reqBody.leader,
-        visimisi,
+        visimisi: reqBody.visimisi,
         address: reqBody.address,
       });
 
-      await AppDataSource.createQueryBuilder()
+      await AppDataSource.getRepository(Partai)
+        .createQueryBuilder()
         .insert()
         .into(Partai)
         .values(partai)
         .execute();
-
-      console.log(partai);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async find(): Promise<any> {
-    try {
-      const partai = await AppDataSource.getRepository(Partai)
-        .createQueryBuilder("partai")
-        .getMany();
 
       return partai;
     } catch (error) {
@@ -44,33 +31,60 @@ export default new (class PartaiServices {
     }
   }
 
-  async update(partaiId: number, reqBody: any): Promise<any> {
+  async findAll(): Promise<any> {
     try {
-      const repository = AppDataSource.getRepository(Partai);
+      const partais = await AppDataSource.getRepository(Partai)
+        .createQueryBuilder("partai")
+        .leftJoinAndSelect("partai.paslon", "paslon")
+        .getMany();
 
-      await repository
-        .createQueryBuilder()
-        .update(Partai)
-        .set(reqBody)
-        .where("id = :id", { id: partaiId })
-        .execute();
+      return partais;
     } catch (error) {
       throw error;
     }
   }
 
-  async delete(partaiId: number): Promise<any> {
+  async findOne(id: number): Promise<any> {
     try {
-      const repository = AppDataSource.getRepository(Partai);
+      const partai = AppDataSource.getRepository(Partai)
+        .createQueryBuilder("partai")
+        .leftJoinAndSelect("partai.paslon", "paslon")
+        .where("partai.id = :id", { id })
+        .getOne();
 
-      await repository
+      return partai;
+    } catch (error) {
+      throw error("Error while finding partai by id:", error);
+    }
+  }
+
+  async update(id: number, data: any): Promise<any> {
+    try {
+      const partai = await AppDataSource.getRepository(Partai)
+        .createQueryBuilder()
+        .update(Partai)
+        .set(data)
+        .where("id = :id", { id })
+        .execute();
+
+      return partai;
+    } catch (error) {
+      throw error("Failed to update partai!", error);
+    }
+  }
+
+  async delete(id: number): Promise<any> {
+    try {
+      const partai = await AppDataSource.getRepository(Partai)
         .createQueryBuilder()
         .delete()
         .from(Partai)
-        .where("id = :id", { id: partaiId })
+        .where("id = :id", { id })
         .execute();
+
+      return partai;
     } catch (error) {
-      throw error;
+      throw error("Failed to delete user!", error);
     }
   }
 })();

@@ -14,32 +14,35 @@ Route.post("/login", AuthControllers.login);
 
 // Route Article
 Route.post("/article", ArticleControllers.create);
-Route.get("/articles", ArticleControllers.find);
+Route.get("/articles", ArticleControllers.findAll);
 Route.get("/article/:id", ArticleControllers.findOne);
 Route.patch("/article/:id", ArticleControllers.update);
 Route.delete("/article/:id", ArticleControllers.delete);
 
 // Route Partai
 Route.post("/admin/partai", PartaiControllers.create);
-Route.get("/admin/partais", PartaiControllers.find);
+Route.get("/admin/partais", PartaiControllers.findAll);
+Route.get("/admin/partai/:id", PartaiControllers.findOne);
 Route.patch("/admin/partai/:id", PartaiControllers.update);
 Route.delete("/admin/partai/:id", PartaiControllers.delete);
 
 // Route Paslon
 Route.post("/admin/paslon", PaslonControllers.create);
 Route.get("/admin/paslons", PaslonControllers.findAll);
+Route.get("/admin/paslon/:id", PaslonControllers.findOne);
 Route.patch("/admin/paslon/:id", PaslonControllers.update);
 Route.delete("/admin/paslon/:id", PaslonControllers.delete);
 
 // Route User
-Route.get("/users", UserControllers.find);
-Route.get("/user/:id", UserControllers.findOne);
-Route.patch("/user/:id", UserControllers.update);
-Route.delete("/user/:id", UserControllers.delete);
+Route.get("/admin/users", UserControllers.findAll);
+Route.get("/admin/user/:id", UserControllers.findOne);
+Route.patch("/admin/user/:id", UserControllers.update);
+Route.delete("/admin/user/:id", UserControllers.delete);
 
 // Route Vote
 Route.post("/vote", VoteControllers.create);
-Route.get("/votes", VoteControllers.find);
+Route.get("/votes", VoteControllers.findAll);
+Route.get("/vote/:id", VoteControllers.findOne);
 Route.patch("/vote/:id", VoteControllers.update);
 Route.delete("/vote/:id", VoteControllers.delete);
 

@@ -1,6 +1,13 @@
 // Paslon.ts
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Vote } from "./Vote";
+import { Partai } from "./Partai";
 
 @Entity()
 export class Paslon {
@@ -18,6 +25,9 @@ export class Paslon {
 
   @Column({ type: "jsonb" })
   koalisi: any;
+
+  @ManyToOne(() => Partai, (partai) => partai.paslon)
+  partai: Partai;
 
   @OneToMany(() => Vote, (vote) => vote.paslon)
   vote: Vote[];

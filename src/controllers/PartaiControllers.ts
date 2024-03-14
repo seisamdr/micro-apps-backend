@@ -8,21 +8,24 @@ export default new (class PartaiControllers {
       const data = req.body;
 
       const { error, value } = PartaiValidators.validate(data);
+
       if (error) {
         return res.status(400).json({ message: error.details[0].message });
       }
 
       const partai = await PartaiServices.create(data);
 
-      return res.status(200).json({ message: "Partai created successfully." });
+      return res
+        .status(200)
+        .json({ message: "Partai created successfully.", partai });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   }
 
-  async find(req: Request, res: Response): Promise<Response> {
+  async findAll(req: Request, res: Response): Promise<Response> {
     try {
-      const partais = await PartaiServices.find();
+      const partais = await PartaiServices.findAll();
 
       return res.status(200).json(partais);
     } catch (error) {
@@ -30,28 +33,66 @@ export default new (class PartaiControllers {
     }
   }
 
-  async update(req: Request, res: Response): Promise<Response> {
+  async findOne(req: Request, res: Response): Promise<any> {
     try {
       const partaiId = parseInt(req.params.id);
-      const data = req.body;
+      const partai = await PartaiServices.findOne(partaiId);
 
-      await PartaiServices.update(partaiId, data);
-
-      return res.status(200).json({ message: "Partai updated successfully." });
+      if (partai) {
+        res.status(200).json(partai);
+      } else {
+        res.status(404).json({ message: "Partai not found" });
+      }
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      res
+        .status(500)
+        .json({ message: "Failed to get partai", error: error.message });
     }
   }
 
-  async delete(req: Request, res: Response): Promise<Response> {
+  async update(req: Request, res: Response): Promise<any> {
+    try {
+      const data = req.body;
+      const partaiId = parseInt(req.params.id);
+
+      const { error, value } = PartaiValidators.validate(data);
+
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+      }
+
+      const partai = await PartaiServices.findOne(partaiId);
+
+      if (!partai) return res.status(404).json({ message: "id not found" });
+
+      await PartaiServices.update(partaiId, data);
+
+      return res
+        .status(200)
+        .json({ message: "Partai updated successfully.", partai });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Failed to get partai", error: error.message });
+    }
+  }
+
+  async delete(req: Request, res: Response): Promise<any> {
     try {
       const partaiId = parseInt(req.params.id);
+      const partai = await PartaiServices.findOne(partaiId);
+
+      if (!partai) return res.status(404).json({ message: "id not found" });
 
       await PartaiServices.delete(partaiId);
 
-      return res.status(200).json({ message: "Partai deleted successfully." });
+      return res
+        .status(200)
+        .json({ message: "Partai deleted successfully.", partai });
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      return res
+        .status(500)
+        .json({ message: "Failed to delete partai", error: error.message });
     }
   }
 })();

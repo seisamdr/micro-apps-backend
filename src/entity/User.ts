@@ -1,5 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Article } from "./Article";
 import { Vote } from "./Vote";
+
+export enum Roles {
+  Admin = "Admin",
+  User = "User",
+}
 
 @Entity()
 export class User {
@@ -21,11 +27,18 @@ export class User {
   @Column()
   password: string;
 
-  // @Column()
-  // role: string;
+  @Column({
+    type: "enum",
+    enum: Roles,
+    default: Roles.User,
+  })
+  role: Roles;
+
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[];
 
   @OneToMany(() => Vote, (vote) => vote.user)
-  vote: Vote[];
+  votes: Vote[];
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

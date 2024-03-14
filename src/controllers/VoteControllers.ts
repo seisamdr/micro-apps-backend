@@ -1,55 +1,92 @@
 import { Request, Response } from "express";
 import VoteServices from "../services/VoteServices";
+import { VoteValidators } from "../utils/validators/VoteValidators";
 
-export default new (class VoteController {
+export default new (class VoteControllers {
   async create(req: Request, res: Response): Promise<Response> {
     try {
-      const { userId, paslonId } = req.body;
+      const data = req.body;
 
-      const isVoteExists = await VoteServices.isVoteExists(userId);
-      if (isVoteExists) {
-        return res.status(400).json({ message: "User has already voted." });
+      const { error, value } = VoteValidators.validate(data);
+
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
       }
 
-      const newVote = await VoteServices.createVote(userId, paslonId);
+      const vote = await VoteServices.create(data);
 
-      return res
-        .status(201)
-        .json({ message: "Vote created successfully", vote: newVote });
+      return res.status(200).json(vote);
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(500).json({ message: error });
     }
   }
 
-  async find(req: Request, res: Response): Promise<Response> {
+  async findAll(req: Request, res: Response): Promise<Response> {
     try {
-      const votes = await VoteServices.getAllVotes();
+      const votes = await VoteServices.findAll();
+
       return res.status(200).json(votes);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   }
 
-  async update(req: Request, res: Response): Promise<Response> {
+  async findOne(req: Request, res: Response): Promise<any> {
     try {
       const voteId = parseInt(req.params.id);
-      const newData = req.body;
+      const vote = await VoteServices.findOne(voteId);
 
-      await VoteServices.updateVote(voteId, newData);
-      return res.status(200).json({ message: "Vote updated successfully." });
+      if (vote) {
+        res.status(200).json(vote);
+      } else {
+        res.status(404).json({ message: "vote not found" });
+      }
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      res
+        .status(500)
+        .json({ message: "Failed to get vote", error: error.message });
     }
   }
 
-  async delete(req: Request, res: Response): Promise<Response> {
+  async update(req: Request, res: Response): Promise<any> {
+    try {
+      const data = req.body;
+      const voteId = parseInt(req.params.id);
+
+      const { error, value } = VoteValidators.validate(data);
+
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+      }
+
+      const vote = await VoteServices.findOne(voteId);
+
+      if (!vote) return res.status(404).json({ message: "id not found" });
+
+      await VoteServices.update(voteId, data);
+
+      return res.status(200).json({ message: "Update vote success!", vote });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Failed to get vote", error: error.message });
+    }
+  }
+
+  async delete(req: Request, res: Response): Promise<any> {
     try {
       const voteId = parseInt(req.params.id);
-      await VoteServices.deleteVote(voteId);
+      const vote = await VoteServices.findOne(voteId);
 
-      return res.status(200).json({ message: "Vote deleted successfully." });
+      if (!vote) return res.status(404).json({ message: "id not found" });
+
+      await VoteServices.delete(voteId);
+
+      return res.status(200).json({ message: "Delete vote succses!", vote });
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      return res
+        .status(500)
+        .json({ message: "Failed to delete vote", error: error.message });
     }
   }
 })();

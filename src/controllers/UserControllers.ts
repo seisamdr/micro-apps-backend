@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import UserServices from "../services/UserServices";
+import { UserValidator } from "../utils/validators/UserValidator";
 
 export default new (class UserControllers {
-  async find(req: Request, res: Response): Promise<Response> {
+  async findAll(req: Request, res: Response): Promise<Response> {
     try {
-      const users = await UserServices.find();
+      const users = await UserServices.findAll();
 
       return res.status(201).json(users);
     } catch (error) {
@@ -29,16 +30,24 @@ export default new (class UserControllers {
 
   async update(req: Request, res: Response): Promise<any> {
     try {
-      const id = parseInt(req.params.id);
       const data = req.body;
+      const userId = parseInt(req.params.id);
 
-      const user = await UserServices.findOne(id);
+      const { error, value } = UserValidator.validate(data);
+
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+      }
+
+      const user = await UserServices.findOne(userId);
 
       if (!user) return res.status(404).json({ message: "id not found" });
 
-      await UserServices.update(id, data);
+      await UserServices.update(userId, data);
 
-      return res.status(200).json({ message: "Update user success!", user });
+      return res
+        .status(200)
+        .json({ message: "User updated successfully.", user });
     } catch (error) {
       return res
         .status(500)
@@ -48,14 +57,16 @@ export default new (class UserControllers {
 
   async delete(req: Request, res: Response): Promise<any> {
     try {
-      const id = parseInt(req.params.id);
+      const userId = parseInt(req.params.id);
+      const user = await UserServices.findOne(userId);
 
-      const user = await UserServices.findOne(id);
       if (!user) return res.status(404).json({ message: "id not found" });
 
-      await UserServices.delete(id);
+      await UserServices.delete(userId);
 
-      return res.status(200).json({ message: "Delete user succses!", user });
+      return res
+        .status(200)
+        .json({ message: "User deleted successfully.", user });
     } catch (error) {
       return res
         .status(500)

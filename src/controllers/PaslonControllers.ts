@@ -8,13 +8,16 @@ export default new (class PaslonControllers {
       const data = req.body;
 
       const { error, value } = PaslonValidators.validate(data);
+
       if (error) {
         return res.status(400).json({ message: error.details[0].message });
       }
 
       const paslon = await PaslonServices.create(data);
 
-      return res.status(200).json({ message: "Paslon created successfully." });
+      return res
+        .status(200)
+        .json({ message: "Paslon created successfully.", paslon });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -30,28 +33,66 @@ export default new (class PaslonControllers {
     }
   }
 
-  async update(req: Request, res: Response): Promise<Response> {
+  async findOne(req: Request, res: Response): Promise<any> {
     try {
       const paslonId = parseInt(req.params.id);
-      const data = req.body;
+      const paslon = await PaslonServices.findOne(paslonId);
 
-      await PaslonServices.update(paslonId, data);
-
-      return res.status(200).json({ message: "Paslon updated successfully." });
+      if (paslon) {
+        res.status(200).json(paslon);
+      } else {
+        res.status(404).json({ message: "Paslon not found" });
+      }
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      res
+        .status(500)
+        .json({ message: "Failed to get paslon", error: error.message });
     }
   }
 
-  async delete(req: Request, res: Response): Promise<Response> {
+  async update(req: Request, res: Response): Promise<any> {
+    try {
+      const data = req.body;
+      const paslonId = parseInt(req.params.id);
+
+      const { error, value } = PaslonValidators.validate(data);
+
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+      }
+
+      const paslon = await PaslonServices.findOne(paslonId);
+
+      if (!paslon) return res.status(404).json({ message: "id not found" });
+
+      await PaslonServices.update(paslonId, data);
+
+      return res
+        .status(200)
+        .json({ message: "Paslon updated successfully.", paslon });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Failed to get paslon", error: error.message });
+    }
+  }
+
+  async delete(req: Request, res: Response): Promise<any> {
     try {
       const paslonId = parseInt(req.params.id);
+      const paslon = await PaslonServices.findOne(paslonId);
+
+      if (!paslon) return res.status(404).json({ message: "id not found" });
 
       await PaslonServices.delete(paslonId);
 
-      return res.status(200).json({ message: "Paslon deleted successfully." });
+      return res
+        .status(200)
+        .json({ message: "Paslon deleted successfully.", paslon });
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+      return res
+        .status(500)
+        .json({ message: "Failed to delete paslon", error: error.message });
     }
   }
 })();

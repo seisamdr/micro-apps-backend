@@ -1,76 +1,104 @@
 import { AppDataSource } from "../data-source";
-import { Paslon } from "../entity/Paslon";
-import { User } from "../entity/User";
 import { Vote } from "../entity/Vote";
+import PaslonServices from "./PaslonServices";
+import UserServices from "./UserServices";
 
-export default new (class VoteService {
-  async isVoteExists(userId: number): Promise<boolean> {
+export default new (class voteServices {
+  async create(reqBody: any): Promise<any> {
+    const userId = parseInt(reqBody.userId);
+    const paslonId = parseInt(reqBody.paslonId);
+
+    if (isNaN(userId) || isNaN(paslonId)) {
+      throw new Error("Invalid userId or paslonId");
+    }
+
+    const user = await UserServices.findOne(userId);
+    const paslon = await PaslonServices.findOne(paslonId);
+
+    if (!user || !paslon) {
+      throw new Error("User or paslon not found");
+    }
+
     try {
-      const voteRepository = AppDataSource.getRepository(Vote);
+      const vote = AppDataSource.getRepository(Vote).create({
+        user: user,
+        paslon: paslon,
+      });
 
-      const voteCount = await voteRepository
+      await AppDataSource.getRepository(Vote)
+        .createQueryBuilder()
+        .insert()
+        .into(Vote)
+        .values(vote)
+        .execute();
+
+      return vote;
+    } catch (error) {
+      throw new Error("Failed to create vote");
+    }
+  }
+
+  async findAll(): Promise<any> {
+    try {
+      const votes = await AppDataSource.getRepository(Vote)
         .createQueryBuilder("vote")
-        .where("vote.user = :userId", { userId })
-        .getCount();
+        .leftJoinAndSelect("vote.paslon", "paslon")
+        .leftJoinAndSelect("vote.user", "user")
+        .getMany();
 
-      return voteCount > 0;
+      return votes;
     } catch (error) {
       throw error;
     }
   }
 
-  async createVote(userId: number, paslonId: number): Promise<Vote> {
+  async findOne(id: number): Promise<any> {
     try {
-      const voteRepository = AppDataSource.getRepository(Vote);
-      const userRepository = AppDataSource.getRepository(User);
-      const paslonRepository = AppDataSource.getRepository(Paslon);
+      const vote = AppDataSource.getRepository(Vote)
+        .createQueryBuilder("vote")
+        .leftJoinAndSelect("vote.paslon", "paslon")
+        .leftJoinAndSelect("vote.user", "user")
+        .where("vote.id = :id", { id })
+        .getOne();
 
-      const user = await userRepository.findOne({
-        where: { id: userId },
-      });
-      const paslon = await paslonRepository.findOne({
-        where: { id: paslonId },
-      });
-
-      if (!user || !paslon) {
-        throw new Error("User or Paslon not found");
-      }
-
-      const newVote = voteRepository.create({
-        user,
-        paslon,
-      });
-
-      return await voteRepository.save(newVote);
+      return vote;
     } catch (error) {
-      throw error;
+      throw error("Error while finding vote by id:", error);
     }
   }
 
-  async getAllVotes(): Promise<Vote[]> {
+  async update(id: number, data: any): Promise<any> {
     try {
-      const voteRepository = AppDataSource.getRepository(Vote);
-      return await voteRepository.find();
+      const validData = {
+        user: data.userId,
+        paslon: data.paslonId,
+      };
+
+      const vote = await AppDataSource.getRepository(Vote)
+        .createQueryBuilder()
+        .update(Vote)
+        .set(validData)
+        .where("id = :id", { id })
+        .execute();
+
+      return vote;
     } catch (error) {
-      throw error;
+      throw new Error("Failed to update vote!");
     }
   }
 
-  async updateVote(voteId: number, newData: Partial<Vote>): Promise<void> {
+  async delete(id: number): Promise<any> {
     try {
-      const voteRepository = AppDataSource.getRepository(Vote);
-      await voteRepository.update({ id: voteId }, newData);
-    } catch (error) {
-      throw error;
-    }
-  }
+      const vote = await AppDataSource.getRepository(Vote)
+        .createQueryBuilder()
+        .delete()
+        .from(Vote)
+        .where("vote.id = :id", { id })
+        .execute();
 
-  async deleteVote(voteId: number): Promise<void> {
-    try {
-      const voteRepository = AppDataSource.getRepository(Vote);
-      await voteRepository.delete({ id: voteId });
+      return vote;
     } catch (error) {
-      throw error;
+      throw error("Failed to delete user!", error);
     }
   }
 })();

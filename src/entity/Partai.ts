@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Paslon } from "./Paslon";
 
 @Entity()
 export class Partai {
@@ -19,6 +20,9 @@ export class Partai {
 
   @Column()
   address: string;
+
+  @OneToMany(() => Paslon, (paslon) => paslon.partai)
+  paslon: Paslon[];
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
