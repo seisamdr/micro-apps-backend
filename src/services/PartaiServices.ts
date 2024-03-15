@@ -4,17 +4,17 @@ import { Partai } from "../entity/Partai";
 export default new (class PartaiServices {
   async create(reqBody: any): Promise<any> {
     try {
-      // const cleanVisimisi = reqBody.visimisi
-      //   ? reqBody.visimisi.replace(/["\\]/g, "")
-      //   : "";
+      const cleanVisimisi = reqBody.visimisi
+        ? reqBody.visimisi.replace(/["\\]/g, "")
+        : "";
 
-      // const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
+      const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
 
       const partai = AppDataSource.getRepository(Partai).create({
         image: reqBody.image,
         name: reqBody.name,
         leader: reqBody.leader,
-        visimisi: reqBody.visimisi,
+        visimisi: visimisi,
         address: reqBody.address,
       });
 

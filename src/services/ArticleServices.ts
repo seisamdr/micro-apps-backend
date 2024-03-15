@@ -6,6 +6,10 @@ export default new (class ArticleServices {
   async create(reqBody: any): Promise<any> {
     try {
       const author = await UserServices.findOne(reqBody.author);
+      if (!author) {
+        throw new Error("Author not found");
+      }
+
       const article = AppDataSource.getRepository(Article).create({
         title: reqBody.title,
         content: reqBody.content,

@@ -4,21 +4,21 @@ import { Paslon } from "../entity/Paslon";
 export default new (class PaslonServices {
   async create(reqBody: any): Promise<any> {
     try {
-      // const cleanVisimisi = reqBody.visimisi
-      //   ? reqBody.visimisi.replace(/["\\]/g, "")
-      //   : "";
-      // const cleanKoalisi = reqBody.koalisi
-      //   ? reqBody.koalisi.replace(/["\\]/g, "")
-      //   : "";
+      const cleanVisimisi = reqBody.visimisi
+        ? reqBody.visimisi.replace(/["\\]/g, "")
+        : "";
+      const cleanKoalisi = reqBody.koalisi
+        ? reqBody.koalisi.replace(/["\\]/g, "")
+        : "";
 
-      // const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
-      // const koalisi = cleanKoalisi ? cleanKoalisi.split(",") : [];
+      const visimisi = cleanVisimisi ? cleanVisimisi.split(",") : [];
+      const koalisi = cleanKoalisi ? cleanKoalisi.split(",") : [];
 
       const paslon = AppDataSource.getRepository(Paslon).create({
         name: reqBody.name,
         image: reqBody.image,
-        visimisi: reqBody.visimisi,
-        koalisi: reqBody.koalisi,
+        visimisi: visimisi,
+        koalisi: koalisi,
       });
 
       await AppDataSource.getRepository(Paslon)
@@ -30,6 +30,7 @@ export default new (class PaslonServices {
 
       return paslon;
     } catch (error) {
+      console.log("Error in creating paslon:", error);
       throw error;
     }
   }
